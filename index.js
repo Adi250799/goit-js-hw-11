@@ -1,16 +1,12 @@
-(function(){const t=document.createElement("link").relList;if(t&&t.supports&&t.supports("modulepreload"))return;for(const e of document.querySelectorAll('link[rel="modulepreload"]'))a(e);new MutationObserver(e=>{for(const s of e)if(s.type==="childList")for(const c of s.addedNodes)c.tagName==="LINK"&&c.rel==="modulepreload"&&a(c)}).observe(document,{childList:!0,subtree:!0});function r(e){const s={};return e.integrity&&(s.integrity=e.integrity),e.referrerPolicy&&(s.referrerPolicy=e.referrerPolicy),e.crossOrigin==="use-credentials"?s.credentials="include":e.crossOrigin==="anonymous"?s.credentials="omit":s.credentials="same-origin",s}function a(e){if(e.ep)return;e.ep=!0;const s=r(e);fetch(e.href,s)}})();const l="46058905-76d6ace161caaf887286baf22",d=document.getElementById("search-form"),u=document.getElementById("search-input"),i=document.getElementById("gallery"),n=document.getElementById("loader");let p=new SimpleLightbox(".gallery a");const f=async o=>{const t=`https://pixabay.com/api/?key=${l}&q=${encodeURIComponent(o)}&image_type=photo&orientation=horizontal&safesearch=true`;function r(){n.style.display="block"}function a(){n.style.display="none"}n.hidden=!0;try{r();const s=await(await fetch(t)).json();a(),h(),n.hidden=!1,s.hits.length===0?iziToast.error({title:"Error",message:"Sorry, there are no images matching your search query. Please try again!"}):(m(s.hits),p.refresh())}catch(e){n.hidden=!0,console.error("Error fetching images from Pixabay:",e)}},m=o=>{o.forEach(t=>{const r=document.createElement("div");r.classList.add("card"),r.innerHTML=`
-            <a href="${t.largeImageURL}">
-                <img src="${t.webformatURL}" alt="${t.tags}">
-            </a>
-            <div class="stats">
-                <span class="span">Likes
-                ${t.likes}</span>
-                <span class="span">Views 
-                ${t.views}</span>
-                <span class="span">Comments 
-                ${t.comments}</span>
-                <span class="span">Downloads 
-                ${t.downloads}</span>
-            </div>
-        `,i.appendChild(r)})},h=()=>{i.innerHTML=""};d.addEventListener("submit",o=>{o.preventDefault();const t=u.value.trim();t!==""&&f(t)});
+import{i,a as u,S as d}from"./assets/vendor-u8rapaCG.js";(function(){const o=document.createElement("link").relList;if(o&&o.supports&&o.supports("modulepreload"))return;for(const e of document.querySelectorAll('link[rel="modulepreload"]'))n(e);new MutationObserver(e=>{for(const t of e)if(t.type==="childList")for(const a of t.addedNodes)a.tagName==="LINK"&&a.rel==="modulepreload"&&n(a)}).observe(document,{childList:!0,subtree:!0});function r(e){const t={};return e.integrity&&(t.integrity=e.integrity),e.referrerPolicy&&(t.referrerPolicy=e.referrerPolicy),e.crossOrigin==="use-credentials"?t.credentials="include":e.crossOrigin==="anonymous"?t.credentials="omit":t.credentials="same-origin",t}function n(e){if(e.ep)return;e.ep=!0;const t=r(e);fetch(e.href,t)}})();const f="YOUR_API_KEY",m="https://pixabay.com/api/",p=document.querySelector("#search-form"),c=document.querySelector("#gallery"),y=document.querySelector("#loader");let g;p.addEventListener("submit",h);async function h(s){s.preventDefault();const o=s.target.querySelector("#query").value.trim();if(o===""){i.error({title:"Error",message:"Please enter a search term!"});return}L(),l();try{const{data:r}=await u.get(`${m}?key=${f}&q=${o}&image_type=photo&orientation=horizontal&safesearch=true`);r.hits.length===0?i.warning({title:"No results",message:"Sorry, there are no images matching your search query. Please try again!"}):(b(r.hits),g=new d(".gallery a",{captionsData:"alt",captionDelay:250}))}catch{i.error({title:"Error",message:"Failed to fetch images. Please try again later."})}finally{l()}}function b(s){const o=s.map(r=>`
+    <a href="${r.largeImageURL}" class="gallery__item">
+      <img src="${r.webformatURL}" alt="${r.tags}" loading="lazy" />
+      <div class="info">
+        <p><b>Likes:</b> ${r.likes}</p>
+        <p><b>Views:</b> ${r.views}</p>
+        <p><b>Comments:</b> ${r.comments}</p>
+        <p><b>Downloads:</b> ${r.downloads}</p>
+      </div>
+    </a>
+  `).join("");c.innerHTML=o}function L(){c.innerHTML=""}function l(){y.classList.toggle("hidden")}
 //# sourceMappingURL=index.js.map
