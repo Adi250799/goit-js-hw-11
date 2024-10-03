@@ -4,72 +4,105 @@ import 'izitoast/dist/css/iziToast.min.css';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 
-// Klucz API Pixabay
+
 const API_KEY = '46331793-9cec4180ce0cddf1fbb8fc669';
-const BASE_URL = 'https://pixabay.com/api/';
 
-const form = document.querySelector('#search-form');
-const gallery = document.querySelector('#gallery');
-const loader = document.querySelector('#loader');
-let lightbox;
+// Elementy DOM
+const searchForm = document.getElementById('search-form');
+const searchInput = document.getElementById('search-input');
+const gallery = document.getElementById('gallery');
+const loader = document.getElementById('loader');
 
-form.addEventListener('submit', onSearch);
+// Inicjalizacja SimpleLightbox
+let lightbox = new SimpleLightbox('.gallery a');
 
-async function onSearch(event) {
-  event.preventDefault();
-  const query = event.target.querySelector('#query').value.trim();
+// Funkcja wyszukiwania obrazów
+const searchImages = async query => {
+  const url = `https://pixabay.com/api/?key=${API_KEY}&q=${encodeURIComponent(
+    query
+  )}&image_type=photo&orientation=horizontal&safesearch=true`;
 
-  if (query === '') {
-    iziToast.error({
-      title: 'Error',
-      message: 'Please enter a search term!',
-    });
-    return;
+  // Funkcja pokazująca i ukrywająca loader
+  function showLoader() {
+    loader.style.display = 'block';
   }
 
-  clearGallery();
-  toggleLoader();
+  function hideLoader() {
+    loader.style.display = 'none';
+  }
+
+  // Pokaż loader
+  loader.hidden = true;
 
   try {
-    const { data } = await axios.get(`${BASE_URL}?key=${API_KEY}&q=${query}&image_type=photo&orientation=horizontal&safesearch=true`);
+    showLoader();
+    const response = await fetch(url);
+    const data = await response.json();
+
+    hideLoader();
+
+    // Czyszczenie galerii przed dodaniem nowych wyników
+    clearGallery();
+
+    // Ukryj loader
+    loader.hidden = false;
+
     if (data.hits.length === 0) {
-      iziToast.warning({
-        title: 'No results',
-        message: 'Sorry, there are no images matching your search query. Please try again!',
+      // Wyświetlanie komunikatu iziToast
+      iziToast.error({
+        title: 'Error',
+        message:
+          'Sorry, there are no images matching your search query. Please try again!',
       });
     } else {
-      renderGallery(data.hits);
-      lightbox = new SimpleLightbox('.gallery a', { captionsData: 'alt', captionDelay: 250 });
+      // Wyświetlanie obrazów
+      displayImages(data.hits);
+      // Odświeżenie lightboxa po dodaniu nowych elementów
+      lightbox.refresh();
     }
   } catch (error) {
-    iziToast.error({
-      title: 'Error',
-      message: 'Failed to fetch images. Please try again later.',
-    });
-  } finally {
-    toggleLoader();
+    // Ukryj loader w przypadku błędu
+    loader.hidden = true;
+    console.error('Error fetching images from Pixabay:', error);
   }
-}
+};
 
-function renderGallery(images) {
-  const markup = images.map(image => `
-    <a href="${image.largeImageURL}" class="gallery__item">
-      <img src="${image.webformatURL}" alt="${image.tags}" loading="lazy" />
-      <div class="info">
-        <p><b>Likes:</b> ${image.likes}</p>
-        <p><b>Views:</b> ${image.views}</p>
-        <p><b>Comments:</b> ${image.comments}</p>
-        <p><b>Downloads:</b> ${image.downloads}</p>
-      </div>
-    </a>
-  `).join('');
-  gallery.innerHTML = markup;
-}
+// Funkcja do wyświetlania obrazów w galerii
+const displayImages = images => {
+  images.forEach(image => {
+    const card = document.createElement('div');
+    card.classList.add('card');
 
-function clearGallery() {
+    card.innerHTML = `
+            <a href="${image.largeImageURL}">
+                <img src="${image.webformatURL}" alt="${image.tags}">
+            </a>
+            <div class="stats">
+                <span class="span">Likes
+                ${image.likes}</span>
+                <span class="span">Views 
+                ${image.views}</span>
+                <span class="span">Comments 
+                ${image.comments}</span>
+                <span class="span">Downloads 
+                ${image.downloads}</span>
+            </div>
+        `;
+
+    gallery.appendChild(card);
+  });
+};
+
+// Funkcja do czyszczenia galerii
+const clearGallery = () => {
   gallery.innerHTML = '';
-}
+};
 
-function toggleLoader() {
-  loader.classList.toggle('hidden');
-}
+// Obsługa formularza wyszukiwania
+searchForm.addEventListener('submit', e => {
+  e.preventDefault();
+  const query = searchInput.value.trim();
+  if (query !== '') {
+    searchImages(query);
+  }
+});
