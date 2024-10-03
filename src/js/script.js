@@ -5,7 +5,7 @@ import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 
 // Klucz API Pixabay
-const API_KEY = 'g';
+const API_KEY = '46331793-9cec4180ce0cddf1fbb8fc669';
 const BASE_URL = 'https://pixabay.com/api/';
 
 const form = document.querySelector('#search-form');
