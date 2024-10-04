@@ -17,7 +17,7 @@ form.addEventListener('submit', onSearch);
 
 async function onSearch(event) {
   event.preventDefault();
-  const query = event.target.querySelector('#query').value.trim();
+  const query = event.target.querySelector('#search-input').value.trim();
 
   if (query === '') {
     iziToast.error({
